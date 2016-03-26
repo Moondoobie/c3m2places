@@ -14,21 +14,13 @@ class Place
     return mongo_client[collection]
   end
 
-  # def self.load_hash(file_path) 
-  #   file=File.read(file_path)
-  #   JSON.parse(file)
-  # end
-
-  # def load_collection(file_path) 
-  #   hash=self.class.load_hash(file_path)
-  #   @coll.insert_many(hash)
-  # end
-
-
+  # read string from file, parse and turn into a ruby hash
   def self.load_all(file)
     json = file.read
     hash=JSON.parse(json)
     self.collection.insert_many(hash)
   end
+
+
 
 end
