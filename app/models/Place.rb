@@ -39,5 +39,11 @@ class Place
 
   end
 
+  def self.find_by_short_name(string_in)
+    return self.collection.find(:"address_components.short_name"=>string_in)
+    #doc=collection.find(:"address_components.short_name"=>string_in)
+    #return doc.nil? ? nil : Place.new(doc)
+  end
+
 
 end
