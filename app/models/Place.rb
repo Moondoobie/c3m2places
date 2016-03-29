@@ -45,5 +45,14 @@ class Place
     #return doc.nil? ? nil : Place.new(doc)
   end
 
+  def self.to_places input
+    r=input.map { |p| Place.new(p) }
+  end
+
+  def self.find id
+    object_id = BSON::ObjectId.from_string(id) 
+    doc = collection.find( :_id => object_id ).first
+    return doc.nil? ? nil : Place.new(doc)
+  end
 
 end
