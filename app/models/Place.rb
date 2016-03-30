@@ -65,5 +65,43 @@ class Place
               .delete_one
   end
 
+  def self.get_address_components(sort=nil, offset=0, limit=nil)
+    # collection.find.aggregate([
+    #                                         {:$unwind=>'$address_components'},
+    #                                         {:$project=>{ :_id=>1, :address_components=>1, :formatted_address=>1, :"geometry.geolocation"=>1}}, 
+    #                                         {:$sort=>sort } if !sort.nil?,
+    #                                         {:$skip=> offset },
+    #                                         {:$limit=>limit} if !limit.nil?
+    #                                      ]).each {|r| pp r}
+    
+    self.collection.find.aggregate([])
+    pipeline = []
+    pipeline << {:$unwind=>'$address_components'}
+    pipeline << {:$project=>{ :_id=>1, :address_components=>1, :formatted_address=>1, :"geometry.geolocation"=>1}}
+    pipeline << {:$sort=> sort } if !sort.nil?
+    pipeline << {:$skip=> offset }
+    pipeline << {:$limit=> limit } if !limit.nil?
+
+    return self.collection.find.aggregate(pipeline)                                     
+                                    
+    # returns a collection of hash documents with address_components 
+    # and their associated _id, formatted_address and location properties
+  end
+
 
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
