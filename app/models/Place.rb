@@ -66,15 +66,6 @@ class Place
   end
 
   def self.get_address_components(sort=nil, offset=0, limit=nil)
-    # collection.find.aggregate([
-    #                                         {:$unwind=>'$address_components'},
-    #                                         {:$project=>{ :_id=>1, :address_components=>1, :formatted_address=>1, :"geometry.geolocation"=>1}}, 
-    #                                         {:$sort=>sort } if !sort.nil?,
-    #                                         {:$skip=> offset },
-    #                                         {:$limit=>limit} if !limit.nil?
-    #                                      ]).each {|r| pp r}
-    
-    self.collection.find.aggregate([])
     pipeline = []
     pipeline << {:$unwind=>'$address_components'}
     pipeline << {:$project=>{ :_id=>1, :address_components=>1, :formatted_address=>1, :"geometry.geolocation"=>1}}
@@ -89,17 +80,29 @@ class Place
   end
 
   def self.get_country_names
-    #self.collection.find.aggregate([])
     pipeline = []
     pipeline << {:$unwind=>'$address_components'}
     pipeline << {:$unwind=>'$address_components.types'}
     pipeline << {:$match =>{:"address_components.types" =>'country'}}
     pipeline << {:$project=>{:_id=>0, :address_components=>{:long_name =>1,:types=>1}}}
     pipeline << {:$group=> {:_id => '$address_components.long_name'}}
+
     result = self.collection.find.aggregate(pipeline)
     return result.to_a.map {|h| h[:_id]}  
   end
 
+  def self.find_ids_by_country_code(code)
+    pipeline = []
+    pipeline << {:$match =>{:"address_components.types" =>'country'}}
+    pipeline << {:$match =>{:"address_components.short_name" => code }}  
+    pipeline << {:$project=>{:_id=>1 }}
+  
+    result = self.collection.find.aggregate(pipeline)
+    return result.to_a.map {|doc| doc[:_id].to_s}
+
+    # will return the id of each document in the places collection that has an 
+    # address_component.short_name of type country and matches the provided parameter
+  end
 
 end
 
