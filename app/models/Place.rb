@@ -88,6 +88,18 @@ class Place
     # and their associated _id, formatted_address and location properties
   end
 
+  def self.get_country_names
+    #self.collection.find.aggregate([])
+    pipeline = []
+    pipeline << {:$unwind=>'$address_components'}
+    pipeline << {:$unwind=>'$address_components.types'}
+    pipeline << {:$match =>{:"address_components.types" =>'country'}}
+    pipeline << {:$project=>{:_id=>0, :address_components=>{:long_name =>1,:types=>1}}}
+    pipeline << {:$group=> {:_id => '$address_components.long_name'}}
+    result = self.collection.find.aggregate(pipeline)
+    return result.to_a.map {|h| h[:_id]}  
+  end
+
 
 end
 
