@@ -104,6 +104,18 @@ class Place
     # address_component.short_name of type country and matches the provided parameter
   end
 
+  # create a 2dsphere index to your collection for the geometry.geolocation property
+  def self.create_indexes
+    self.collection.indexes.create_one({ :"geometry.geolocation"=>Mongo::Index::GEO2DSPHERE })
+  end
+  
+  # remove a 2dsphere index to your collection for the geometry.geolocation property
+  def self.remove_indexes
+    self.collection.indexes.drop_one("geometry.geolocation_2dsphere")
+    #self.collection.indexes.drop_one("loc_2dsphere")
+  end
+
+
 end
 
 
