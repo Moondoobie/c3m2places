@@ -30,11 +30,11 @@ class Place
       @location = Point.new(params[:geometry][:geolocation])
 
       @address_components = []
-      #if !place_hash[:address_components].nil?
+      if !params[:address_components].nil?
         params[:address_components].each do |ac|
           @address_components << AddressComponent.new(ac)
         end
-      #end
+      end
     end
 
   end
@@ -133,6 +133,20 @@ class Place
     #:$geometry=>{:type=>"Point",:coordinates=>[@longitude,@latitude]}, 
     # returns places that are closest to the provided Point
   end
+
+
+  def near(max_dist=nil)
+
+    if (max_dist.nil?)
+      pnear = self.class.near(@location)
+    else
+      pnear = self.class.near(@location, max_dist)
+    end
+
+    self.class.to_places(pnear)
+
+  end
+
 
 end
 
