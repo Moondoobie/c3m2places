@@ -112,11 +112,32 @@ class Place
   # remove a 2dsphere index to your collection for the geometry.geolocation property
   def self.remove_indexes
     self.collection.indexes.drop_one("geometry.geolocation_2dsphere")
-    #self.collection.indexes.drop_one("loc_2dsphere")
   end
 
+  def self.near(pt, max_meters=nil)    
+    pt_hash = pt.to_hash   
+
+    if !max_meters.nil?
+      self.collection.find(
+          :"geometry.geolocation"=>{:$near=>{
+            :$geometry=>pt_hash, 
+            :$maxDistance=>max_meters }}
+          )
+    else
+      self.collection.find(
+          :"geometry.geolocation"=>{:$near=>{
+            :$geometry=>pt_hash }}
+          )
+    end
+
+    #:$geometry=>{:type=>"Point",:coordinates=>[@longitude,@latitude]}, 
+    # returns places that are closest to the provided Point
+  end
 
 end
+
+
+
 
 
 
