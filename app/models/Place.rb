@@ -25,7 +25,6 @@ class Place
   def initialize(params={})
     if params
       @id=params[:_id].nil? ? params[:id] : params[:_id].to_s
-      #@id = params[:_id].to_s
       @formatted_address = params[:formatted_address]
       @location = Point.new(params[:geometry][:geolocation])
 
