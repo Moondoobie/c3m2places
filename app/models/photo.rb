@@ -59,5 +59,12 @@ class Photo
   	return d
   end
 
+  def self.find(id)
+  	dt = Photo.mongo_client.database.fs
+    object_id = BSON::ObjectId.from_string(id) 
+    doc = dt.find( :_id => object_id ).first
+    return doc.nil? ? nil : Photo.new(doc)
+  end
+
 
 end
