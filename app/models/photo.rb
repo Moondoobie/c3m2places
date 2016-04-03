@@ -42,8 +42,21 @@ class Photo
       # property and the object in class location property.
       # store the data contents in GridFS
       # store the generated _id for the file in the :id property of the Photo model instance
-      
+
     end
+  end
+
+  
+  def self.all(offset=0, limit=nil)
+    dt = Photo.mongo_client.database.fs
+
+    if !limit.nil? 
+      d = dt.find.skip(offset).limit(limit).map { |p| Photo.new(p) } 
+  	else
+      d = dt.find.skip(offset).map { |p| Photo.new(p) } 
+  	end
+  	
+  	return d
   end
 
 
