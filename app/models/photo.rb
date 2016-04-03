@@ -30,10 +30,10 @@ class Photo
       description[:metadata][:location] = @location.to_hash
 
       if @contents
+      	@contents.rewind
         grid_file = Mongo::Grid::File.new(@contents.read, description)
       	id=self.class.mongo_client.database.fs.insert_one(grid_file)
-      	@id=id.to_s
-      	@contents.rewind
+      	@id=id.to_s      	
       end
       
       # use the exifr gem to extract geolocation information from the jpeg image.
@@ -64,6 +64,26 @@ class Photo
     object_id = BSON::ObjectId.from_string(id) 
     doc = dt.find( :_id => object_id ).first
     return doc.nil? ? nil : Photo.new(doc)
+  end
+
+  def contents
+    f=self.class.mongo_client.database.fs.find_one(id_criteria)
+    if f 
+      buffer = ""
+      f.chunks.reduce([]) do |x,chunk| 
+          buffer << chunk.data.data 
+      end
+      return buffer
+    end 
+  end
+
+  def self.id_criteria id
+    {_id:BSON::ObjectId.from_string(id)}
+  end
+
+
+  def id_criteria
+    self.class.id_criteria @id
   end
 
 
