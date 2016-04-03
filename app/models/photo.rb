@@ -86,5 +86,24 @@ class Photo
     self.class.id_criteria @id
   end
 
+  def destroy
+    self.class.mongo_client.database.fs.find(id_criteria).delete_one
+  end
+  
+  # returns the _id of the document within the places collection
+  def find_nearest_place_id(max_meters)
+    places = Place.near(@location, max_meters).projection(_id:true).limit(1)
+
+    if (places && places.count>0)
+      places.first[:_id]
+    else
+  	  nil
+    end
+
+    # limit the result to only the nearest matching place (Hint: limit())
+    # limit the result to only the _id of the matching place document (Hint: projection())
+    # returns zero or one BSON::ObjectIds for the nearby place found
+  end
+
 
 end
