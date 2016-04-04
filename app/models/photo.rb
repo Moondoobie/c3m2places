@@ -42,7 +42,12 @@ class Photo
       # property and the object in class location property.
       # store the data contents in GridFS
       # store the generated _id for the file in the :id property of the Photo model instance
+    else
 
+      dt = Photo.mongo_client.database.fs
+      object_id = BSON::ObjectId.from_string(@id) 
+ 
+      dt.find(:_id=> object_id).update_one(:$set=>{:metadata=>{:location => @location.to_hash}})	
     end
   end
 
